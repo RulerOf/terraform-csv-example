@@ -26,7 +26,7 @@ Both are a nightmare. First, let's look at using the External Data source. This 
 
 ```hcl
 data "external" "csv_file" {
-  program = ["jq", "--slurp", "--raw-input", "--raw-output", "split(\"\n\") | .[1:] | map(select(length > 0) | split(\",\")) | map({\"name\": .[0], \"value\": .[1], \"description\": .[2], \"tag\": .[3]}) | {\"names\": map(.name) | join(\",\"), \"values\": map(.value) | join(\",\"), \"description\": map(.description) | join(\",\"), \"tag\": map(.tag) | join(\",\")}", "${path.module}/test.csv"]
+  program = ["jq", "--slurp", "--raw-input", "--raw-output", "split(\"\n\") | .[1:] | map(select(length > 0) | split(\",\")) | map({\"name\": .[0], \"value\": .[1], \"description\": .[2], \"tag\": .[3]}) | {\"names\": map(.name) | join(\",\"), \"values\": map(.value) | join(\",\"), \"description\": map(.description) | join(\",\"), \"tag\": map(.tag) | join(\",\")}", "${path.module}/sample.csv"]
 }
 
 resource "null_resource" "csv_external_data_source_method" {
@@ -70,7 +70,7 @@ This strategy has us performing lots of repetitive interpolation thanks to a few
 ```hcl
 data "null_data_source" "csv_file" {
   inputs = {
-    file_data = "${chomp(file("${path.module}/test.csv"))}"
+    file_data = "${chomp(file("${path.module}/sample.csv"))}"
   }
 }
 
