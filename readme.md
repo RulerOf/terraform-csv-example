@@ -4,9 +4,9 @@ This repo contains a slightly edited version of my answer, along with the code I
 
 # How do I create terraform resources from a CSV file?
 
-There's no simple answer here.  I will warn you that **the solution is positively insane and I do not recommend you use it.**
+There's no simple answer here. I will warn you that **the solution is very obtuse and I do not recommend using it.**
 
-I took your sample CSV and realized that to get it into terraform, the only two routes are to either convert it to a single JSON object and then read it in with the [external data source](https://www.terraform.io/docs/providers/external/data_source.html),  or to build a CSV parser out of terraform interpolation syntax. We'll try both.
+I took a sample CSV and realized that to get it into terraform, the only two routes are to either convert it to a single JSON object and then read it in with the [external data source](https://www.terraform.io/docs/providers/external/data_source.html),  or to build a CSV parser out of terraform interpolation syntax. We'll try both.
 
 <!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
@@ -22,7 +22,7 @@ I took your sample CSV and realized that to get it into terraform, the only two 
 
 ## Using an External Data Source
 
-Both are a nightmare. First, let's look at using the External Data source. This one front-loads the insanity by using JQ to [format the data](https://pastebin.com/FPXY6qhV) for consumption by the external provider:
+First, let's look at using the External Data source. This one front-loads the insanity by [using JQ to format the data](https://gist.github.com/RulerOf/0c95c1f6344479f9c064079fc6070b85) for consumption by the external provider:
 
 ```hcl
 data "external" "csv_file" {
@@ -62,8 +62,9 @@ That single resource gives us a `terraform plan` output that will count out to t
 
 You'll obviously need to have jq installed.
 
-## Using raw Terraform Interpolation
+It's worth mentioning that this can probably be made less crazy by using a script to parse the data and feed something a little more dynamic to JQ, but JQ and I don't have quite that kind of relationship ;)
 
+## Using raw Terraform Interpolation
 
 This strategy has us performing lots of repetitive interpolation thanks to a few limitations in the [null data source](https://www.terraform.io/docs/providers/null/data_source.html). In this example, the data source is pretty short, but the resource where we use the data is incomprehensibly long, with each key in the resource using no fewer than eight interpolation functions:
 
@@ -107,7 +108,6 @@ Nonetheless, we end up with identical `terraform plan` output:
 ```
 
 ## Explanation
-
 
 Of the two, I actually consider the interpolation technique to be the better choice. It's pure terraform and somehow less obtuse. Somehow. Now, let's walk through some of the interpolation:
 
@@ -154,9 +154,8 @@ name = "${element(split(",", element(slice(split("\n", lookup(data.null_data_sou
 
 # Conclusion
 
+You can do it, but the lack of any real answer elsewhere on the internet... turns out it's for a reason. There's special code in each of these techniques to ensure that the first line of the CSV isn't processed, so your CSV _must_ have a header just like the example one does if you see fit to use this.
 
-You can do it, but the lack of any real answer here or on the internet in general... turns out it's for a reason.  There's special code in each of those techniques to ensure that the first line of the CSV isn't processed, so your CSV _must_ have a header just like the example one you gave me did if you see fit to use this.
-
-I'm only really writing this up here because it's a topic that I couldn't find really anywhere on the Internet, and since it's _possible_, I decided I had to figure out just how it would have to work.  Perhaps solving this here could lead to a better implementation by someone else, but I'm not really sure about that.  Terraform could probably stand to have some proper CSV/JSON support instead.  What I'm doing technically doesn't even follow the spec because it doesn't handle properly-escaped commas which CAN exist in a CSV file.
+I'm only really writing this up here because it's a topic that I couldn't find really anywhere on the Internet, and since it's _possible_, I decided I had to figure out just how it would have to work. Perhaps solving this here could lead to a better implementation by someone else, but I'm not really sure about that. Terraform could probably stand to have some proper CSV/JSON support instead. Also, this technically doesn't even follow [the spec](https://tools.ietf.org/html/rfc4180) because it doesn't handle properly-escaped commas which CAN exist in a CSV file.
 
 Cheers.
