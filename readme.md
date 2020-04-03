@@ -2,7 +2,7 @@
 
 Do not use this. [Terraform 0.12 introduced `csvdecode()`](https://www.terraform.io/docs/configuration/functions/csvdecode.html), which you should use instead.
 
-This technique is necessary, and it probably was never really recommended. It was mostly an advanced walkthrough of just how far you could push Terraform's interpolation functions to make up for missing features.
+This technique is unnecessary and was never really recommended. It was mostly an advanced walkthrough of just how far you could push Terraform's interpolation functions to make up for missing features.
 
 The original text follows.
 
