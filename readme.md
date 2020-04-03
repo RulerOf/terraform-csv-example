@@ -1,3 +1,13 @@
+# Update 2020-04-02
+
+Do not use this. [Terraform 0.12 introduced `csvdecode()`](https://www.terraform.io/docs/configuration/functions/csvdecode.html), which you should use instead.
+
+This technique is necessary, and it probably was never really recommended. It was mostly an advanced walkthrough of just how far you could push Terraform's interpolation functions to make up for missing features.
+
+The original text follows.
+
+--------
+
 This originally spawned from [a reddit thread](https://www.reddit.com/r/Terraform/comments/8h7k9v/how_to_create_large_number_of_resoucres_in/) asking how to create resources from a CSV file.
 
 This repo contains a slightly edited version of my answer, along with the code I used just for reference.
